@@ -1,0 +1,320 @@
+:root {
+  --asfalto: #1c232a;
+  --painel: #252e36;
+  --borda: #3a4651;
+  --texto: #e9edf0;
+  --suave: #9aa8b4;
+
+  /* Cores com significado de sinalização */
+  --amarelo: #f7b801;   /* atenção: freadas bruscas */
+  --verde: #36b37e;     /* dentro do limite */
+  --vermelho: #ef4b4b;  /* acima do limite */
+  --ceu: #4fb0e5;       /* volume de carros */
+
+  --fonte-num: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --fonte-txt: "Barlow", system-ui, sans-serif;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--asfalto);
+  color: var(--texto);
+  font-family: var(--fonte-txt);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+h1, h2, h3, p { margin: 0; }
+
+:focus-visible {
+  outline: 2px solid var(--amarelo);
+  outline-offset: 2px;
+}
+
+/* ---------- Topo ---------- */
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1280px;
+  margin: 0 auto 24px;
+  padding: 28px 24px 20px;
+  border-bottom: 2px dashed var(--amarelo); /* faixa central da pista */
+}
+
+h1 {
+  font-family: var(--fonte-num);
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 1.05;
+}
+
+.via { color: var(--suave); }
+
+.controles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.periodos {
+  display: inline-flex;
+  border: 1px solid var(--borda);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.periodos button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--suave);
+  font: 500 15px var(--fonte-txt);
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.periodos button + button { border-left: 1px solid var(--borda); }
+.periodos button:hover { color: var(--texto); }
+.periodos button[aria-pressed="true"] {
+  background: var(--amarelo);
+  color: #1c232a;
+  font-weight: 600;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--suave);
+  font-size: 14px;
+}
+
+.ponto {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--suave);
+}
+.status.online .ponto { background: var(--verde); }
+.status.offline .ponto { background: var(--vermelho); }
+.status.offline { color: var(--texto); }
+
+/* ---------- Grade ---------- */
+.painel {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 16px;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px 48px;
+}
+
+.bloco {
+  background: var(--painel);
+  border: 1px solid var(--borda);
+  border-radius: 6px;
+  padding: 20px;
+  min-width: 0;
+}
+
+.velocimetro  { grid-column: span 5; }
+.kpis         { grid-column: span 7; }
+.fluxo        { grid-column: span 8; }
+.cumprimento  { grid-column: span 4; }
+.freadas      { grid-column: span 5; }
+.ocorrencias  { grid-column: span 7; }
+
+h2 {
+  font-family: var(--fonte-num);
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.legenda-texto, .nota {
+  color: var(--suave);
+  font-size: 14px;
+}
+.legenda-texto { margin-top: 2px; }
+.nota strong { color: var(--texto); font-weight: 600; }
+
+/* ---------- Velocímetro ---------- */
+.velocimetro { display: flex; flex-direction: column; }
+.velocimetro svg {
+  width: 100%;
+  max-width: 440px;
+  margin: 8px auto 0;
+  display: block;
+}
+.velocimetro .nota { text-align: center; margin-top: 4px; }
+
+.g-trilha { fill: none; stroke-width: 16; }
+.g-trilha--ok { stroke: #34414c; }
+.g-trilha--alto { stroke: rgba(239, 75, 75, 0.28); }
+.g-valor { fill: none; stroke: var(--verde); stroke-width: 16; }
+.g-valor.alto { stroke: var(--vermelho); }
+.g-limite { stroke: var(--texto); stroke-width: 3; }
+
+.g-numero {
+  font-family: var(--fonte-num);
+  font-weight: 700;
+  font-size: 68px;
+  fill: var(--texto);
+}
+.g-unidade { font-family: var(--fonte-num); font-weight: 500; font-size: 20px; fill: var(--suave); }
+.g-rotulo { font-family: var(--fonte-txt); font-size: 13px; fill: var(--suave); }
+
+/* ---------- Números principais ---------- */
+.kpis {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 4px;
+  background: var(--painel);
+  border: 1px solid var(--borda);
+  border-left: 6px solid var(--cor, var(--suave));
+  border-radius: 3px 6px 6px 3px;
+  padding: 16px 20px;
+}
+.kpi--carros  { --cor: var(--ceu); }
+.kpi--ok      { --cor: var(--verde); }
+.kpi--acima   { --cor: var(--vermelho); }
+.kpi--freadas { --cor: var(--amarelo); }
+
+.kpi h3 {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--suave);
+}
+
+.kpi .num {
+  font-family: var(--fonte-num);
+  font-weight: 700;
+  font-size: clamp(44px, 5vw, 64px);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.kpi .sub { color: var(--suave); font-size: 14px; }
+
+.barra {
+  height: 6px;
+  background: #34414c;
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 4px 0;
+}
+.barra span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--cor);
+  transition: width 0.5s ease;
+}
+
+/* ---------- Gráficos ---------- */
+.grafico {
+  position: relative;
+  height: 280px;
+  margin-top: 12px;
+}
+.grafico--baixo { height: 240px; }
+
+.rosca {
+  position: relative;
+  height: 200px;
+  margin: 16px 0 12px;
+}
+.rosca-centro {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.rosca-centro strong {
+  font-family: var(--fonte-num);
+  font-weight: 700;
+  font-size: 44px;
+  line-height: 1;
+}
+.rosca-centro span { color: var(--suave); font-size: 14px; }
+
+.legenda {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.legenda li { display: flex; align-items: center; gap: 8px; }
+.legenda b {
+  margin-left: auto;
+  font-family: var(--fonte-num);
+  font-weight: 600;
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+}
+.chip { width: 12px; height: 12px; border-radius: 2px; }
+.chip--ok { background: var(--verde); }
+.chip--acima { background: var(--vermelho); }
+
+/* ---------- Tabela ---------- */
+.tabela-rolagem { overflow-x: auto; margin-top: 8px; }
+
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 10px 12px; white-space: nowrap; }
+thead th {
+  color: var(--suave);
+  font-weight: 500;
+  font-size: 14px;
+  border-bottom: 1px solid var(--borda);
+}
+tbody tr + tr td { border-top: 1px solid rgba(58, 70, 81, 0.6); }
+td { font-variant-numeric: tabular-nums; }
+td.vazio { color: var(--suave); text-align: center; padding: 24px; }
+
+.tipo { display: inline-flex; align-items: center; gap: 8px; }
+.tipo::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--cor);
+}
+.tipo--freada { --cor: var(--amarelo); }
+.tipo--acima  { --cor: var(--vermelho); }
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 1000px) {
+  .velocimetro, .kpis, .fluxo, .cumprimento, .freadas, .ocorrencias {
+    grid-column: span 12;
+  }
+}
+
+@media (max-width: 560px) {
+  .topo { padding: 20px 16px 16px; }
+  .painel { padding: 0 16px 32px; gap: 12px; }
+  h1 { font-size: 32px; }
+  .kpis { grid-template-columns: 1fr; gap: 12px; }
+  .grafico { height: 240px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barra span { transition: none; }
+}
