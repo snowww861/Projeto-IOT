@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Painel de trânsito</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topo">
+    <div>
+      <h1>Painel de trânsito</h1>
+      <p class="via" id="via">Carregando via…</p>
+    </div>
+
+    <div class="controles">
+      <div class="periodos" role="group" aria-label="Período analisado">
+        <button type="button" data-periodo="1h" aria-pressed="true">1 hora</button>
+        <button type="button" data-periodo="6h" aria-pressed="false">6 horas</button>
+        <button type="button" data-periodo="24h" aria-pressed="false">24 horas</button>
+      </div>
+      <p class="status" id="status" role="status" aria-live="polite">
+        <span class="ponto" aria-hidden="true"></span>
+        <span id="status-texto">Conectando…</span>
+      </p>
+    </div>
+  </header>
+
+  <main class="painel">
+    <!-- Ao vivo: sensores na rodovia -->
+    <section class="bloco rodovia" aria-labelledby="t-rodovia">
+      <h2 id="t-rodovia">Sensores na rodovia</h2>
+      <p class="legenda-texto">Verde: sensor detectando. Vermelho: livre. Os carros seguem da esquerda para a direita.</p>
+      <svg id="rodovia" viewBox="0 0 640 230" role="img" aria-label="Estado dos três sensores na rodovia">
+        <rect class="r-pista" x="0" y="50" width="640" height="120" />
+        <line class="r-borda" x1="0" y1="52" x2="640" y2="52" />
+        <line class="r-borda" x1="0" y1="168" x2="640" y2="168" />
+        <line class="r-faixa" x1="0" y1="110" x2="640" y2="110" />
+        <path class="r-seta" d="M 24 140 h 52 m -12 -9 l 12 9 l -12 9" />
+
+        <g class="sensor" id="sensor-1" transform="translate(160 0)">
+          <rect class="s-barra" x="-5" y="44" width="10" height="132" rx="3" />
+          <circle class="s-lampada" cx="0" cy="26" r="14" />
+          <text class="s-nome" x="0" y="200">Sensor 1</text>
+          <text class="s-estado" id="st-1" x="0" y="219">Livre</text>
+        </g>
+        <g class="sensor" id="sensor-2" transform="translate(320 0)">
+          <rect class="s-barra" x="-5" y="44" width="10" height="132" rx="3" />
+          <circle class="s-lampada" cx="0" cy="26" r="14" />
+          <text class="s-nome" x="0" y="200">Sensor 2</text>
+          <text class="s-estado" id="st-2" x="0" y="219">Livre</text>
+        </g>
+        <g class="sensor" id="sensor-3" transform="translate(480 0)">
+          <rect class="s-barra" x="-5" y="44" width="10" height="132" rx="3" />
+          <circle class="s-lampada" cx="0" cy="26" r="14" />
+          <text class="s-nome" x="0" y="200">Sensor 3</text>
+          <text class="s-estado" id="st-3" x="0" y="219">Livre</text>
+        </g>
+      </svg>
+      <p class="nota" id="rodovia-status" role="status" aria-live="polite">Conectando aos sensores…</p>
+    </section>
+
+    <!-- Últimos 3 veículos -->
+    <section class="bloco ultimos" aria-labelledby="t-ultimos">
+      <h2 id="t-ultimos">Últimos 3 veículos</h2>
+      <ul class="veiculos" id="veiculos">
+        <li class="vazio-lista">Aguardando veículos…</li>
+      </ul>
+      <ul class="legenda legenda--cores" aria-label="Legenda das cores">
+        <li><span class="chip chip--ok"></span>Na velocidade</li>
+        <li><span class="chip chip--acima"></span>Acima da velocidade</li>
+        <li><span class="chip chip--freada"></span>Freada brusca</li>
+        <li><span class="chip chip--ambos"></span>Acima e freada</li>
+      </ul>
+    </section>
+
+    <!-- Destaque: velocidade média da via -->
+    <section class="bloco velocimetro" aria-labelledby="t-velocidade">
+      <h2 id="t-velocidade">Velocidade média da via</h2>
+      <svg id="gauge" viewBox="0 0 320 210" role="img" aria-label="Velocímetro da velocidade média">
+        <path id="g-trilha-ok" class="g-trilha g-trilha--ok" />
+        <path id="g-trilha-alto" class="g-trilha g-trilha--alto" />
+        <path id="g-valor" class="g-valor" />
+        <line id="g-limite" class="g-limite" />
+        <text id="g-limite-texto" class="g-rotulo" text-anchor="middle"></text>
+        <text id="g-numero" class="g-numero" x="160" y="166" text-anchor="middle">--</text>
+        <text class="g-unidade" x="160" y="192" text-anchor="middle">km/h</text>
+        <text class="g-rotulo" x="40" y="204" text-anchor="middle">0</text>
+        <text class="g-rotulo" x="280" y="204" text-anchor="middle">120</text>
+      </svg>
+      <p class="nota">Limite da via: <strong id="limite">--</strong> km/h</p>
+    </section>
+
+    <!-- Números principais -->
+    <section class="kpis" aria-label="Números do período">
+      <article class="kpi kpi--carros">
+        <h3>Carros que passaram</h3>
+        <p class="num" id="k-carros">--</p>
+        <p class="sub" id="k-carros-sub">&nbsp;</p>
+      </article>
+
+      <article class="kpi kpi--ok">
+        <h3>Na velocidade</h3>
+        <p class="num" id="k-ok">--</p>
+        <div class="barra"><span id="k-ok-barra"></span></div>
+        <p class="sub" id="k-ok-sub">&nbsp;</p>
+      </article>
+
+      <article class="kpi kpi--acima">
+        <h3>Acima da velocidade</h3>
+        <p class="num" id="k-acima">--</p>
+        <div class="barra"><span id="k-acima-barra"></span></div>
+        <p class="sub" id="k-acima-sub">&nbsp;</p>
+      </article>
+
+      <article class="kpi kpi--freadas">
+        <h3>Freadas bruscas</h3>
+        <p class="num" id="k-freadas">--</p>
+        <p class="sub" id="k-freadas-sub">&nbsp;</p>
+      </article>
+    </section>
+
+    <section class="bloco fluxo" aria-labelledby="t-fluxo">
+      <h2 id="t-fluxo">Fluxo e velocidade ao longo do tempo</h2>
+      <p class="legenda-texto">Barras: carros por intervalo. Linha: velocidade média em km/h.</p>
+      <div class="grafico">
+        <canvas id="grafico-fluxo" role="img" aria-label="Gráfico de carros por intervalo e velocidade média"></canvas>
+      </div>
+    </section>
+
+    <section class="bloco cumprimento" aria-labelledby="t-limite">
+      <h2 id="t-limite">Respeito ao limite</h2>
+      <div class="rosca">
+        <canvas id="grafico-rosca" role="img" aria-label="Proporção de carros na velocidade e acima da velocidade"></canvas>
+        <div class="rosca-centro">
+          <strong id="d-pct">--</strong>
+          <span>na velocidade</span>
+        </div>
+      </div>
+      <ul class="legenda">
+        <li><span class="chip chip--ok"></span>Na velocidade <b id="d-ok">--</b></li>
+        <li><span class="chip chip--acima"></span>Acima da velocidade <b id="d-acima">--</b></li>
+      </ul>
+    </section>
+
+    <section class="bloco freadas" aria-labelledby="t-freadas">
+      <h2 id="t-freadas">Freadas bruscas por intervalo</h2>
+      <div class="grafico grafico--baixo">
+        <canvas id="grafico-freadas" role="img" aria-label="Gráfico de freadas bruscas por intervalo"></canvas>
+      </div>
+    </section>
+
+    <section class="bloco ocorrencias" aria-labelledby="t-ocorrencias">
+      <h2 id="t-ocorrencias">Ocorrências recentes</h2>
+      <div class="tabela-rolagem">
+        <table>
+          <thead>
+            <tr><th scope="col">Horário</th><th scope="col">Ocorrência</th><th scope="col">Faixa</th><th scope="col">Velocidade</th></tr>
+          </thead>
+          <tbody id="eventos">
+            <tr><td colspan="4" class="vazio">Aguardando dados…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
